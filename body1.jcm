@@ -1,0 +1,122 @@
+/*
+    military_health
+    ---------------------------
+
+    JaCaMo Project File
+
+    This file defines the initial state of the MAS (initial agents, environment, organisation, ....)
+
+    (see jacamo/doc/jcm.html for more information about what can be defined in this file)
+
+    JaCaMo <VERSION>
+    <DATE>
+*/
+
+mas body1 {
+/*	Configuration Parameters : 
+ * calibrationValue() belief initializes the sensors with initial values 
+ * calibrationValue("sensorName", int calibration value,"measurementUnit",
+ *								 					int initial measured value,"sensorType")
+ * valid sensorType's are: "temp","rr","hr","sbp","gyro","acc","spo2"
+ * disableBroken("sensorName") disables 'knwon' broken/unreliable sensors
+ * stale("sensorName", <time in milliseconds>) sets the approved maximum lifetime for a received measurement
+ * per 'valid' sensorType
+ * 
+ * Calibration, Personalisation, sensorInitValues must be within "" because negative values are rejected in .jcm
+ * AgentSpeak calls getDouble(Inputvalue<String>, Returnvalue<Double>) to fix this configuration issue.
+*/
+    agent sensor_agent1s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    			 	sensorTypeVisible(true,"temp")
+    }
+    agent sensor_agent1s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    			 	sensorTypeVisible(true,"temp")
+    }
+    agent sensor_agent1s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent sensor_agent1s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent body_agent1 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent2])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body1")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+			 	 outlierRemove(true)
+	}
+	agent symptom_agent1 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		   		 bodyName("body1")
+			 	 teamName("team1") 
+			 	 mySim("outlier_demo")
+			 	 symptomVisible(false)
+	}
+	agent team_agent1 : team_agent.asl{
+		beliefs: teamName("team1")
+				role("teamAgent")
+				ccAgent(ccAgent1)
+				//thresholdVisible(true)
+				diagnoseVisible(true)
+	}
+	agent ccAgent1 : cc_receiver.asl {
+		beliefs: role("ccAgent")
+				teamName("team1")
+				thresholdVisible(false)
+				costsVisible(false)
+				diagnoseVisible(true)
+	}
+	agent simulation_agent {
+		beliefs: teamName("team1")
+	}
+	//asl-path:  src/agt, src/agt/inc
+    platform: 		cartago()		//,jade("-container -host localhost  -container-name c1")
+    	centralised(pool,8,21,21,40,82)
+    	//centralised(pool, 8, 42)
+    node bodynode1 running @ localhost
+
+}
+

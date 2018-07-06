@@ -1,0 +1,2747 @@
+/*
+    military_health
+    ---------------------------
+
+    JaCaMo Project File
+
+    This file defines the initial state of the MAS (initial agents, environment, organisation, ....)
+
+    (see jacamo/doc/jcm.html for more information about what can be defined in this file)
+
+    JaCaMo <VERSION>
+    <DATE>
+*/
+
+mas aserver {
+/*	Configuration Parameters : 
+ * calibrationValue() belief initializes the sensors with initial values 
+ * calibrationValue("sensorName", int calibration value,"measurementUnit",
+ *								 					int initial measured value,"sensorType")
+ * valid sensorType's are: "temp","rr","hr","sbp","gyro","acc","spo2"
+ * disableBroken("sensorName") disables 'knwon' broken/unreliable sensors
+ * stale("sensorName", <time in milliseconds>) sets the approved maximum lifetime for a received measurement
+ * per 'valid' sensorType
+ * 
+ * Calibration, Personalisation, sensorInitValues must be within "" because negative values are rejected in .jcm
+ * AgentSpeak calls getDouble(Inputvalue<String>, Returnvalue<Double>) to fix this configuration issue.
+*/
+    agent sensor_agent1s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent sensor_agent1s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent sensor_agent1s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent sensor_agent1s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body1")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent1")
+    }
+    agent body_agent01 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body1")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent1 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		       		bodyName("body1")
+    			 	teamName("team1")
+    			 	mySim("impaired_mental_unconsciousness")
+	}
+	/* body 2 */
+	 agent sensor_agent2s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body2")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent2")
+    }
+    agent sensor_agent2s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body2")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent2")
+    }
+    agent sensor_agent2s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body2")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent2")
+    }
+    agent sensor_agent2s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body2")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent2")
+    }
+    agent body_agent02 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body2")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent2 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       			 	bodyName("body2")
+    			 	teamName("team1")
+    			 	mySim("hyperthermia_hyperpyrexia")
+	}
+	/* body 3 */
+	 agent sensor_agent3s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body3")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent3")
+    }
+    agent sensor_agent3s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body3")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent3")
+    }
+    agent sensor_agent3s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body3")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent3")
+    }
+    agent sensor_agent3s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body3")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent3")
+    }
+    agent body_agent03 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body3")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent3 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body3")
+    			 	teamName("team1")
+    			 	mySim("hyperthermia")
+	}
+	/* body 4 */
+	 agent sensor_agent4s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body4")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent4")
+    }
+    agent sensor_agent4s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body4")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent4")
+    }
+    agent sensor_agent4s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body4")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent4")
+    }
+    agent sensor_agent4s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body4")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent4")
+    }
+    agent body_agent04 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body4")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent4 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body4")
+    			 	teamName("team1")
+    			 	mySim("bradypnea_apnea")
+	}
+	
+		 agent sensor_agent5s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body5")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent5")
+    }
+    agent sensor_agent5s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body5")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent5")
+    }
+    agent sensor_agent5s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body5")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent5")
+    }
+    agent sensor_agent5s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body5")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent5")
+    }
+    agent body_agent05 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body5")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent5 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body5")
+    			 	teamName("team1")
+					mySim("bradypnea")
+	}
+	
+		 agent sensor_agent6s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body6")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent6")
+    }
+    agent sensor_agent6s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body6")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent6")
+    }
+    agent sensor_agent6s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body6")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent6")
+    }
+    agent sensor_agent6s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body6")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent6")
+    }
+    agent body_agent06 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body6")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent6 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body6")
+    			 	teamName("team1")
+    			 	mySim("hyperventilation")
+	}
+	
+		 agent sensor_agent7s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body7")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent7")
+    }
+    agent sensor_agent7s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body7")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent7")
+    }
+    agent sensor_agent7s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body7")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent7")
+    }
+    agent sensor_agent7s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body7")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent7")
+    }
+    agent body_agent07 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body7")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent7 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body7")
+    			 	teamName("team1")
+    			 	mySim("shot_shock")
+	}
+	
+		 agent sensor_agent8s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body8")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent8")
+    }
+    agent sensor_agent8s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body8")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent8")
+    }
+    agent sensor_agent8s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body8")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent8")
+    }
+    agent sensor_agent8s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body8")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent8")
+    }
+    agent body_agent08 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body8")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent8 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body8")
+    			 	teamName("team1")
+    			 	mySim("shot")
+	}
+	/* Second Batch of Agents */
+	
+	   agent sensor_agent21s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body21")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent21")
+    }
+    agent sensor_agent21s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body21")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent21")
+    }
+    agent sensor_agent21s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body21")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent21")
+    }
+    agent sensor_agent21s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body21")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent21")
+    }
+    agent body_agent21 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent2])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body21")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent21 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		       		bodyName("body21")
+    			 	teamName("team1")
+    			 	mySim("death_2sensors")
+	}
+	/* body 2 */
+	 agent sensor_agent22s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body22")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent22")
+    }
+    agent sensor_agent22s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body22")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent22")
+    }
+    agent sensor_agent22s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body22")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent22")
+    }
+    agent sensor_agent22s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body22")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent22")
+    }
+    agent body_agent22 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent2])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body22")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent22 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       			 	bodyName("body22")
+    			 	teamName("team1")
+    			 	mySim("death_quite_abnormal")
+	}
+	/* body 3 */
+	 agent sensor_agent23s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body23")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent23")
+    }
+    agent sensor_agent23s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body23")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent23")
+    }
+    agent sensor_agent23s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body23")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent23")
+    }
+    agent sensor_agent23s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body23")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent23")
+    }
+    agent body_agent23 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body23")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent23 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body23")
+    			 	teamName("team1")
+    			 	mySim("death_all_sensors")
+	}
+	/* body2 4 */
+	 agent sensor_agent24s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body24")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent24")
+    }
+    agent sensor_agent24s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body24")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent24")
+    }
+    agent sensor_agent24s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body24")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent24")
+    }
+    agent sensor_agent24s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body24")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent24")
+    }
+    agent body_agent24 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body24")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent24 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body24")
+    			 	teamName("team1")
+    			 	mySim("hr_sleeping")
+	}
+	
+		 agent sensor_agent25s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body25")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent25")
+    }
+    agent sensor_agent25s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body25")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent25")
+    }
+    agent sensor_agent25s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body25")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent25")
+    }
+    agent sensor_agent25s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body25")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent25")
+    }
+    agent body_agent25 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body25")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent25 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body25")
+    			 	teamName("team1")
+    			 	mySim("hr_exploding")
+	}
+	
+		 agent sensor_agent26s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body26")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent26")
+    }
+    agent sensor_agent26s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body26")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent26")
+    }
+    agent sensor_agent26s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body26")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent26")
+    }
+    agent sensor_agent26s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body26")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent26")
+    }
+    agent body_agent26 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body26")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent26 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body26")
+    			 	teamName("team1")
+    			 	mySim("hr_over_exercising")
+	}
+	
+		 agent sensor_agent27s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body27")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent27")
+    }
+    agent sensor_agent27s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body27")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent27")
+    }
+    agent sensor_agent27s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body27")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent27")
+    }
+    agent sensor_agent27s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body27")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent27")
+    }
+    agent body_agent27 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body27")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent27 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body27")
+    			 	teamName("team1")
+    			 	mySim("hr_exercising")
+	}
+	
+		 agent sensor_agent28s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body28")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent28")
+    }
+    agent sensor_agent28s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body28")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent28")
+    }
+    agent sensor_agent28s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body28")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent28")
+    }
+    agent sensor_agent28s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body28")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent28")
+    }
+    agent body_agent28 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent21,body_agent22])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body28")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent28 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body28")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* third batch of Agents */
+		
+	   agent sensor_agent41s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body41")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent41")
+    }
+    agent sensor_agent41s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body41")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent41")
+    }
+    agent sensor_agent41s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body41")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent41")
+    }
+    agent sensor_agent41s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body41")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent41")
+    }
+    agent body_agent41 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body41")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent41 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		       		bodyName("body41")
+    			 	teamName("team1")
+    			 	mySim("shock")
+	}
+	/* body 2 */
+	 agent sensor_agent42s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body42")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent42")
+    			 	sensorTypeVisible(true,"temp")
+    }
+    agent sensor_agent42s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body42")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent42")
+    			 	sensorTypeVisible(true,"temp")
+    }
+    agent sensor_agent42s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body42")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent42")
+    }
+    agent sensor_agent42s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body42")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent42")
+    }
+    agent body_agent42 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent4])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body42")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+			 	 outlierRemove(true)
+	}
+	agent symptom_agent42 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       			 	bodyName("body42")
+    			 	teamName("team1")
+    			 	mySim("outlier_demo")
+	}
+	/* body 3 */
+	 agent sensor_agent43s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body43")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent43")
+    }
+    agent sensor_agent43s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body43")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent43")
+    }
+    agent sensor_agent43s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body43")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent43")
+    }
+    agent sensor_agent43s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body43")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent43")
+    }
+    agent body_agent43 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body43")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent43 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body43")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* body2 4 */
+	 agent sensor_agent44s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body44")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent44")
+    }
+    agent sensor_agent44s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body44")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent44")
+    }
+    agent sensor_agent44s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body44")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent44")
+    }
+    agent sensor_agent44s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body44")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent44")
+    }
+    agent body_agent44 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body44")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent44 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body44")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent45s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body45")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent45")
+    }
+    agent sensor_agent45s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body45")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent45")
+    }
+    agent sensor_agent45s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body45")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent45")
+    }
+    agent sensor_agent45s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body45")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent45")
+    }
+    agent body_agent45 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body45")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent45 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body45")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent46s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body46")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent46")
+    }
+    agent sensor_agent46s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body46")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent46")
+    }
+    agent sensor_agent46s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body46")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent46")
+    }
+    agent sensor_agent46s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body46")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent46")
+    }
+    agent body_agent46 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body46")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent46 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body46")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent47s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body47")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent47")
+    }
+    agent sensor_agent47s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body47")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent47")
+    }
+    agent sensor_agent47s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body47")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent47")
+    }
+    agent sensor_agent47s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body47")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent47")
+    }
+    agent body_agent47 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body47")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent47 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body47")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent48s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body48")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent48")
+    }
+    agent sensor_agent48s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body48")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent48")
+    }
+    agent sensor_agent48s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body48")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent48")
+    }
+    agent sensor_agent48s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body48")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent48")
+    }
+    agent body_agent48 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent41,body_agent42])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body48")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent48 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body48")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* Fourth Batch of Agents */
+	
+			
+	   agent sensor_agent61s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body61")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent61")
+    }
+    agent sensor_agent61s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body61")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent61")
+    }
+    agent sensor_agent61s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body61")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent61")
+    }
+    agent sensor_agent61s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body61")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent61")
+    }
+    agent body_agent61 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent6])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body61")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent61 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		       		bodyName("body61")
+    			 	teamName("team1")
+    			 	mySim("shock")
+	}
+	/* body 2 */
+	 agent sensor_agent62s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body62")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent62")
+    }
+    agent sensor_agent62s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body62")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent62")
+    }
+    agent sensor_agent62s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body62")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent62")
+    }
+    agent sensor_agent62s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body62")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent62")
+    }
+    agent body_agent62 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent6])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body62")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent62 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       			 	bodyName("body62")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* body 3 */
+	 agent sensor_agent63s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body63")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent63")
+    }
+    agent sensor_agent63s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body63")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent63")
+    }
+    agent sensor_agent63s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body63")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent63")
+    }
+    agent sensor_agent63s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body63")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent63")
+    }
+    agent body_agent63 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body63")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent63 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body63")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* body2 4 */
+	 agent sensor_agent64s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body64")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent64")
+    }
+    agent sensor_agent64s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body64")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent64")
+    }
+    agent sensor_agent64s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body64")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent64")
+    }
+    agent sensor_agent64s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body64")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent64")
+    }
+    agent body_agent64 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body64")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent64 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body64")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent65s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body65")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent65")
+    }
+    agent sensor_agent65s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body65")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent65")
+    }
+    agent sensor_agent65s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body65")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent65")
+    }
+    agent sensor_agent65s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body65")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent65")
+    }
+    agent body_agent65 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body65")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent65 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body65")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent66s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body66")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent66")
+    }
+    agent sensor_agent66s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body66")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent66")
+    }
+    agent sensor_agent66s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body66")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent66")
+    }
+    agent sensor_agent66s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body66")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent66")
+    }
+    agent body_agent66 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body66")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent66 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body66")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent67s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body67")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent67")
+    }
+    agent sensor_agent67s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body67")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent67")
+    }
+    agent sensor_agent67s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body67")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent67")
+    }
+    agent sensor_agent67s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body67")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent67")
+    }
+    agent body_agent67 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body67")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent67 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body67")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent68s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body68")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent68")
+    }
+    agent sensor_agent68s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body68")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent68")
+    }
+    agent sensor_agent68s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body68")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent68")
+    }
+    agent sensor_agent68s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body68")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent68")
+    }
+    agent body_agent68 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent61,body_agent62])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body68")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent68 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body68")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+	/* Fifth Batch of Agents */
+	
+			
+	   agent sensor_agent71s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body71")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent71")
+    }
+    agent sensor_agent71s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body71")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent71")
+    }
+    agent sensor_agent71s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body71")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent71")
+    }
+    agent sensor_agent71s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body71")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent71")
+    }
+    agent body_agent71 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent7])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body71")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent71 : symptom_agent.asl{
+		beliefs: person_name("John Cat")
+		       		bodyName("body71")
+    			 	teamName("team1")
+    			 	mySim("shock")
+	}
+	/* body 2 */
+	 agent sensor_agent72s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body72")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent72")
+    }
+    agent sensor_agent72s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body72")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent72")
+    }
+    agent sensor_agent72s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body72")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent72")
+    }
+    agent sensor_agent72s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body72")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent72")
+    }
+    agent body_agent72 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent1,body_agent7])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body72")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent72 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       			 	bodyName("body72")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* body 3 */
+	 agent sensor_agent73s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body73")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent73")
+    }
+    agent sensor_agent73s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body73")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent73")
+    }
+    agent sensor_agent73s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body73")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent73")
+    }
+    agent sensor_agent73s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body73")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent73")
+    }
+    agent body_agent73 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body73")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent73 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body73")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	/* body2 4 */
+	 agent sensor_agent74s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body74")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent74")
+    }
+    agent sensor_agent74s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body74")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent74")
+    }
+    agent sensor_agent74s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body74")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent74")
+    }
+    agent sensor_agent74s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body74")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent74")
+    }
+    agent body_agent74 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body74")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent74 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body74")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent75s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body75")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent75")
+    }
+    agent sensor_agent75s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body75")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent75")
+    }
+    agent sensor_agent75s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body75")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent75")
+    }
+    agent sensor_agent75s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body75")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent75")
+    }
+    agent body_agent75 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body75")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent75 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body75")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent76s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body76")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent76")
+    }
+    agent sensor_agent76s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body76")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent76")
+    }
+    agent sensor_agent76s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body76")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent76")
+    }
+    agent sensor_agent76s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body76")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent76")
+    }
+    agent body_agent76 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body76")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent76 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body76")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent77s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body77")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent77")
+    }
+    agent sensor_agent77s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body77")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent77")
+    }
+    agent sensor_agent77s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body77")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent77")
+    }
+    agent sensor_agent77s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body77")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent77")
+    }
+    agent body_agent77 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body77")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent77 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body77")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+		 agent sensor_agent78s1 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp1", "1", "degrees C", "36.1", "temp")
+    			 	calibrationValue("SystolicBP1","1", "mmHg", "105", "sbp") //spo2 optical derivation
+    			 	calibrationValue("SpO21", "1", "%", "95", "spo2") //optical
+    			 	calibrationValue("RespRate1", "0", "breath/min", "20", "rr") //optical
+    			 	calibrationValue("ecg4","0","bpm","60","hr") //single wire arm measurement
+    			 	bodyName("body78")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent78")
+    }
+    agent sensor_agent78s2 : sensor_agent.asl {
+    	beliefs: 	calibrationValue("sensorTemp2", "2", "degrees C","35.2","temp")
+    				calibrationValue("sensorSpO2", "4", " %", "94","spo2")
+    				calibrationValue("RespRate2","0","breath/min","20","rr")
+    				calibrationValue("SystolicBP2","1", "mmHg", "105", "sbp")
+    				bodyName("body78")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent78")
+    }
+    agent sensor_agent78s3 : sensor_agent.asl {
+    	beliefs:	calibrationValue("accell1","0","m/s","2","acc") //mems device could also calculate rr
+    				calibrationValue("accell2","0","m/s","2","acc")
+    				calibrationValue("accell3","0","m/s","2","acc")
+    				calibrationValue("accell4","0","m/s","2","acc")
+    				bodyName("body78")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent78")
+    }
+    agent sensor_agent78s4 : sensor_agent.asl {
+    	beliefs:	calibrationValue("ecg1","0","bpm","60","hr")
+    				calibrationValue("ecg2","0","bpm","61","hr")
+    				calibrationValue("ecg3","0","bpm","61","hr")
+    				calibrationValue("gyro1","0","m/s","0.1","gyro")
+    				calibrationValue("gyro2","0","m/s","0.1","gyro")
+    				calibrationValue("gyro3","0","m/s","0.1","gyro")
+    				disableBroken("gyro3") //disables a 'known' broken/unreliable sensor 
+       			 	bodyName("body78")
+    			 	teamName("team1")
+    			 	symptomAgent("symptom_agent78")
+    }
+    agent body_agent78 : body_agent.asl{
+    	beliefs: body_team(first)
+    			 team_leader([body_agent71,body_agent72])
+    			 person_name("John Cat")
+    			 stale("hr", 22000)
+    			 stale("sbp", 21000)
+    			 stale("rr", 18000)
+    			 stale("spo2", 19000)
+    			 stale("temp", 24000)
+    			 stale("gyro", 40000)
+				 stale("acc", 40000)
+    			 personalised("sbp_lower_th_risk", "-4")
+    			 personalised("spo2_lower_th_risk", "-2")
+    			 personalised("hr_lower_th_risk", "-6")
+    			 personalised("hr_high_th_risk", "10")	
+    			 thresholdVisible(false)		
+   			 	 bodyName("body78")
+			 	 teamName("team1") 
+			 	 teamAgent(team_agent1)
+	}
+	agent symptom_agent78 : symptom_agent.asl{
+		beliefs: person_name("John Cat Two")
+		       		bodyName("body78")
+    			 	teamName("team1")
+    			 	mySim("none")
+	}
+	
+	
+	
+	/* Team and Command Centre Agents */
+	agent team_agent1 : team_agent.asl{
+		beliefs: teamName("team1")
+				role("teamAgent")
+				ccAgent(ccAgent1)
+				//thresholdVisible(true)
+				diagnoseVisible(true)
+	}
+	agent ccAgent1 : cc_receiver.asl {
+		beliefs: role("ccAgent")
+				teamName("team1")
+				thresholdVisible(true)
+	}
+	
+	agent simulation_agent {
+		beliefs: teamName("team1")
+	}
+	   
+	//asl-path:  src/agt, src/agt/inc
+    platform: 		cartago("infrastructure")		//,jade("-container -host localhost  -container-name c1")
+    	//jade()
+    	//centralised(pool,4,10,10,24,42)
+    	centralised(pool,8,21,21,40,82) //seems ok
+
+    node bodynode1 running @ localhost
+
+}
+
